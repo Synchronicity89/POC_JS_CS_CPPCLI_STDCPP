@@ -1,12 +1,60 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <style>
+        div {
+            background-color: antiquewhite;
+        }
 
+            div#xmlHR {
+                font-weight: bold;
+            }
+
+            div#jqueryGet {
+                font-style: italic;
+            }
+
+            div#fetch {
+                font-size: small;
+            }
+
+            div.myClass {
+                font-weight: bold;
+            }
+
+        span.boldSpan {
+            font-weight: bold;
+        }
+
+        span.italicSpan {
+            font-style: italic;
+        }
+
+        span.smallSpan {
+            font-size: small;
+        }
+    </style>
+    <script src="Scripts/jquery-3.4.1.js"></script>
     <meta charset="utf-8" />
     <title></title>
 </head>
 <body>
+    <div>Fetched by XMLHttpRequest:</div>
+    <div id="xmlHR"></div>
+    <div>Fetched by fetch:</div>
+    <div id="fetch"></div>
+    <div>Fetched by jQuery get:</div>
+    <div id="jqueryGet"></div>
+    <br />
+    <div class="myClass"></div>
+    <br />
+    <div>
+        <span class="boldSpan"></span>
+        <span class="italicSpan"></span>
+        <span class="smallSpan"></span>
+    </div>
     <script>
+
         //old school
         let x = new XMLHttpRequest();
         x.onreadystatechange = loadFunc;
@@ -14,18 +62,42 @@
         x.send();
         function loadFunc() {
             if (x.readyState === XMLHttpRequest.DONE) {
-                console.log(JSON.parse(x.responseText));
+                var data = JSON.parse(x.responseText);
+                console.log(data);
+                showData(data, "xmlHR");
             }
         }
-
 
         //new school
         fetch("Api/Values")
             .then(response => response.json())
-            .then(data => console.log(data));
+            .then(data => {
+                console.log(data);
+                showData(data, "fetch");
+            });
 
-        //web sockets or signalR is an alternative
+        //jQuery ajax
+        $.get("Api/Values", function (data) {
+            console.log(data);
+            showData(data, "jqueryGet");
+        });
 
+        //Add the data inside a text element of a div
+        function showData(data, id) {
+            var text = "";
+            for (i = 0; i < data.length; i++) {
+                text += (i > 0 ? ", " : "") + data[i];
+            }
+            //jQuery, abbreviated as $, finds elements by id, class or tag type
+            $("#" + id).html(text);
+        }
+        //jQuery id is prefixed with "#", class prefixed with "."
+        //but tag type is prefixed with nothing.  You can hit multiple targets
+        //by just putting a space between them
+        $(".myClass").text("This text added by jQuery");
+
+        //jQuery can manipulate all elements of a certain tag type
+        $("span").text("All spans");
     </script>
 </body>
 </html>
